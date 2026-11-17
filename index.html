@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#17112f">
+  <meta name="description" content="Eonix Invoice — simple, professional invoicing for modern businesses.">
+  <title>Eonix Invoice | Eonix Tech Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">E<span>✦</span></div>
+      <p class="eyebrow">EONIX TECH STUDIO</p>
+      <h1>Make every invoice<br><span>look professional.</span></h1>
+      <p class="muted">Create, manage and track invoices in one simple workspace.</p>
+      <div class="auth-tabs">
+        <button class="tab active" data-auth-tab="login">Sign in</button>
+        <button class="tab" data-auth-tab="signup">Create account</button>
+      </div>
+      <form id="authForm">
+        <label>Email address<input id="authEmail" type="email" required placeholder="you@business.com"></label>
+        <label>Password<input id="authPassword" type="password" required minlength="6" placeholder="At least 6 characters"></label>
+        <button class="btn primary full" type="submit" id="authSubmit">Sign in</button>
+      </form>
+      <p id="authMessage" class="form-message"></p>
+      <p class="tiny muted">Your workspace data is protected by Supabase authentication and database policies.</p>
+    </div>
+  </div>
+
+  <div id="appShell" class="app-shell hidden">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#"><span class="brand-mark small">E<span>✦</span></span><span>Eonix <b>Invoice</b></span></a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav>
+        <button class="nav-link active" data-page="overview"><span>▦</span> Overview</button>
+        <button class="nav-link" data-page="invoices"><span>▤</span> Invoices</button>
+        <button class="nav-link" data-page="customers"><span>♙</span> Customers</button>
+        <button class="nav-link" data-page="reports"><span>◷</span> Reports</button>
+        <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="plan-card"><span class="plan-dot"></span><div><b>Basic plan</b><small>Upgrade options in Settings</small></div></div>
+        <button class="nav-link" id="signOutBtn"><span>↪</span> Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Open menu">☰</button>
+        <div><p class="eyebrow" id="pageEyebrow">WORKSPACE</p><h2 id="pageTitle">Overview</h2></div>
+        <div class="top-actions">
+          <button class="icon-btn" id="themeBtn" title="Toggle theme">☼</button>
+          <button class="avatar" id="userAvatar">E</button>
+        </div>
+      </header>
+
+      <section class="page active" id="page-overview">
+        <div class="welcome-row"><div><h1>Good to see you.</h1><p class="muted">Here is what's happening with your invoices.</p></div><button class="btn primary" id="newInvoiceTop">＋ New invoice</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><span>Total invoiced</span><strong id="statTotal">RM 0.00</strong><small>All issued invoices</small></article>
+          <article class="stat-card"><span>Paid</span><strong id="statPaid">RM 0.00</strong><small>Successfully recorded</small></article>
+          <article class="stat-card"><span>Outstanding</span><strong id="statOutstanding">RM 0.00</strong><small>Awaiting payment</small></article>
+          <article class="stat-card"><span>Customers</span><strong id="statCustomers">0</strong><small>Saved customers</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel wide"><div class="panel-heading"><div><h3>Recent invoices</h3><p class="muted">Your latest invoice activity</p></div><button class="text-btn" data-goto="invoices">View all →</button></div><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="recentRows"><tr><td colspan="5" class="empty">No invoices yet. Create your first invoice.</td></tr></tbody></table></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Quick actions</h3><p class="muted">Get things done faster</p></div></div><button class="quick-action" id="quickCreate"><span class="quick-icon">＋</span><span><b>Create invoice</b><small>Prepare a new bill</small></span><span class="arrow">→</span></button><button class="quick-action" data-goto="customers"><span class="quick-icon">♙</span><span><b>Add customer</b><small>Build your customer list</small></span><span class="arrow">→</span></button></article>
+        </div>
+      </section>
+
+      <section class="page" id="page-invoices">
+        <div class="section-toolbar"><div><h1>Invoices</h1><p class="muted">Create and keep track of your billing.</p></div><button class="btn primary" id="newInvoiceBtn">＋ Create invoice</button></div>
+        <div class="filter-row"><input id="invoiceSearch" placeholder="Search invoice or customer…"><select id="statusFilter"><option value="all">All statuses</option><option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid</option><option value="overdue">Overdue</option><option value="cancelled">Cancelled</option></select></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Issue date</th><th>Due date</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody id="invoiceRows"><tr><td colspan="7" class="empty">Loading invoices…</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-customers">
+        <div class="section-toolbar"><div><h1>Customers</h1><p class="muted">Keep customer details organised.</p></div><button class="btn primary" id="addCustomerBtn">＋ Add customer</button></div>
+        <div class="filter-row"><input id="customerSearch" placeholder="Search customers…"></div>
+        <div class="panel"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Email</th><th>Phone</th><th>Added</th><th></th></tr></thead><tbody id="customerRows"><tr><td colspan="5" class="empty">No customers yet.</td></tr></tbody></table></div></div>
+      </section>
+
+      <section class="page" id="page-reports">
+        <div class="section-toolbar"><div><h1>Reports</h1><p class="muted">A simple view of your invoice performance.</p></div><button class="btn secondary" id="exportCsvBtn">↓ Export CSV</button></div>
+        <div class="stats-grid"><article class="stat-card"><span>Paid invoices</span><strong id="reportPaidCount">0</strong></article><article class="stat-card"><span>Unpaid invoices</span><strong id="reportUnpaidCount">0</strong></article><article class="stat-card"><span>Average invoice</span><strong id="reportAverage">RM 0.00</strong></article><article class="stat-card"><span>Collection rate</span><strong id="reportRate">0%</strong></article></div>
+        <div class="panel"><div class="panel-heading"><div><h3>Invoice summary</h3><p class="muted">Totals by status</p></div></div><div id="reportBreakdown" class="breakdown"></div></div>
+      </section>
+
+      <section class="page" id="page-settings">
+        <div class="section-toolbar"><div><h1>Settings</h1><p class="muted">Manage your business profile and preferences.</p></div></div>
+        <div class="settings-grid">
+          <div class="panel"><h3>Business profile</h3><p class="muted">This information appears on your invoices.</p><form id="businessForm" class="stack-form"><label>Business name<input id="businessName" placeholder="Your business name" required></label><label>Business email<input id="businessEmail" type="email" placeholder="billing@business.com"></label><label>Phone number<input id="businessPhone" placeholder="+60"></label><label>Address<textarea id="businessAddress" rows="3" placeholder="Business address"></textarea></label><label>Default currency<select id="businessCurrency"><option value="MYR">MYR — Malaysian Ringgit (RM)</option><option value="USD">USD — US Dollar ($)</option><option value="SGD">SGD — Singapore Dollar (S$)</option></select></label><button class="btn primary" type="submit">Save profile</button></form></div>
+          <div class="panel"><h3>Plan & account</h3><p class="muted">Choose a plan as your business grows.</p><div class="pricing-option"><div><b>Basic</b><small>For getting started</small></div><strong>Free</strong></div><div class="pricing-option"><div><b>Pro</b><small>For growing businesses</small></div><strong>RM15<span>/mo</span></strong></div><div class="pricing-option"><div><b>Business</b><small>For teams and SMEs</small></div><strong>RM39<span>/mo</span></strong></div><p class="tiny muted">Plan selection and payment activation are not connected yet. Do not treat this screen as a paid subscription checkout.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="invoiceDialog" class="modal">
+    <form id="invoiceForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">BILLING</p><h2 id="invoiceModalTitle">Create invoice</h2></div><button type="button" class="icon-btn" data-close="invoiceDialog">×</button></div>
+      <input type="hidden" id="invoiceId">
+      <div class="form-grid"><label>Customer<select id="invoiceCustomer" required><option value="">Select customer</option></select></label><label>Invoice number<input id="invoiceNumber" required></label><label>Issue date<input id="issueDate" type="date" required></label><label>Due date<input id="dueDate" type="date" required></label><label>Currency<select id="invoiceCurrency"><option value="MYR">MYR (RM)</option><option value="USD">USD ($)</option><option value="SGD">SGD (S$)</option></select></label><label>Status<select id="invoiceStatus"><option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid</option><option value="overdue">Overdue</option><option value="cancelled">Cancelled</option></select></label></div>
+      <div class="items-head"><b>Items</b><button type="button" class="text-btn" id="addItemBtn">＋ Add item</button></div>
+      <div id="invoiceItems"></div>
+      <label>Notes<textarea id="invoiceNotes" rows="2" placeholder="Payment terms or additional notes"></textarea></label>
+      <div class="total-line"><span>Invoice total</span><strong id="invoiceTotal">RM 0.00</strong></div>
+      <div class="modal-actions"><button type="button" class="btn secondary" data-close="invoiceDialog">Cancel</button><button type="submit" class="btn primary">Save invoice</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="customerDialog" class="modal narrow">
+    <form id="customerForm" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">CUSTOMER</p><h2 id="customerModalTitle">Add customer</h2></div><button type="button" class="icon-btn" data-close="customerDialog">×</button></div>
+      <input type="hidden" id="customerId">
+      <label>Customer / company name<input id="customerName" required placeholder="Customer name"></label>
+      <label>Email<input id="customerEmail" type="email" placeholder="name@example.com"></label>
+      <label>Phone<input id="customerPhone" placeholder="+60"></label>
+      <label>Address<textarea id="customerAddress" rows="3"></textarea></label>
+      <div class="modal-actions"><button type="button" class="btn secondary" data-close="customerDialog">Cancel</button><button type="submit" class="btn primary">Save customer</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
